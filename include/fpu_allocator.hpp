@@ -80,4 +80,8 @@ private:
         return (vaddr & ~PAGE_MASK) != ((vaddr + ELEM_SIZE - 1) & ~PAGE_MASK);
     }
 
+public:
+    // handles page faults in the fpu space. As those should never happen, this
+    // function always dies.
+    NORETURN static void page_fault(mword, mword);
 };

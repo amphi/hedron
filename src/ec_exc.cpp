@@ -20,6 +20,7 @@
  */
 
 #include "ec.hpp"
+#include "fpu_allocator.hpp"
 #include "gdt.hpp"
 #include "mca.hpp"
 
@@ -79,6 +80,11 @@ bool Ec::handle_exc_pf (Exc_regs *r)
         return true;
     }
 
+    // Kernel fault in fpu_memory_area
+    if (addr >= SPC_LOCAL_FPU && addr <= SPC_LOCAL_FPU_E) {
+        Fpu_allocator::page_fault (addr, r->err);
+        return true;
+    }
     // Kernel fault in OBJ space
     if (addr >= SPC_LOCAL_OBJ) {
         Space_obj::page_fault (addr, r->err);

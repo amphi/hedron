@@ -1,9 +1,11 @@
 #include "fpu_allocator.hpp"
 
 #include "buddy.hpp"
+#include "ec.hpp"
 #include "hpt.hpp"
 #include "lock_guard.hpp"
 #include "space_mem.hpp"
+#include "stdio.hpp"
 
 void* Fpu_allocator::alloc()
 {
@@ -55,4 +57,12 @@ void Fpu_allocator::allocate_if_necessary(mword vaddr)
     space_mem_->replace(vaddr,
             empty_page_paddr | Hpt::PTE_NX | Hpt::PTE_D | Hpt::PTE_A
                              | Hpt::PTE_W | Hpt::PTE_P);
+}
+
+void Fpu_allocator::page_fault(mword addr, mword error)
+{
+    Paddr paddr;
+    Pd::current()->Space_mem::lookup(addr, &paddr);
+    trace(0, "Fpu_allocator: page fault at address 0x%lx (paddr 0x%lx), error 0x%lx. ERR_W ? %u. ERR_U ? %u", addr, paddr,error, error & Hpt::ERR_W ? 1 : 0, error & Hpt::ERR_U ? 1 : 0);
+    Ec::die("Page-fault in FPU space.");
 }
