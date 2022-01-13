@@ -5,6 +5,7 @@
 #include "hpt.hpp"
 #include "lock_guard.hpp"
 #include "space_mem.hpp"
+#include "static_allocator.hpp"
 #include "stdio.hpp"
 
 void* Fpu_allocator::alloc()
@@ -52,8 +53,12 @@ void Fpu_allocator::allocate_if_necessary(mword vaddr)
         return;
     }
 
-    void* empty_page_vaddr { Buddy::allocator.alloc(0, Buddy::FILL_0) };
-    Paddr empty_page_paddr { Buddy::ptr_to_phys(empty_page_vaddr)     };
+    // void* empty_page_vaddr { Buddy::allocator.alloc(0, Buddy::FILL_0) };
+    // Paddr empty_page_paddr { Buddy::ptr_to_phys(empty_page_vaddr)     };
+    
+    void* empty_page_vaddr { Static_allocator::allocator.alloc()             };
+    Paddr empty_page_paddr { Static_allocator::ptr_to_phys(empty_page_vaddr) };
+    
     space_mem_->replace(vaddr,
             empty_page_paddr | Hpt::PTE_NX | Hpt::PTE_D | Hpt::PTE_A
                              | Hpt::PTE_W | Hpt::PTE_P);
