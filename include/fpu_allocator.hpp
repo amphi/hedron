@@ -55,6 +55,14 @@ private:
         return SPC_LOCAL_FPU + idx * ELEM_SIZE;
     }
 
+    // Returns the index for the element at the given address.
+    inline size_t virt_to_idx(mword vaddr)
+    {
+        assert (vaddr >= SPC_LOCAL_FPU && vaddr < SPC_LOCAL_FPU_E);
+        assert ((vaddr - SPC_LOCAL_FPU) % ELEM_SIZE == 0);
+        return (vaddr - SPC_LOCAL_FPU) / ELEM_SIZE;
+    }
+
     // Returns the virtual address for the element with the given index. If no
     // writeable mapping for the given index exists, this function allocates an
     // empty page from the kernel heap and maps it.

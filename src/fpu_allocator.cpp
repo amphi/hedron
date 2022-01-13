@@ -19,6 +19,14 @@ void* Fpu_allocator::alloc()
     return reinterpret_cast<void*>(walk(free_idx));
 }
 
+void Fpu_allocator::free(void* vaddr)
+{
+    const size_t idx { virt_to_idx(reinterpret_cast<mword>(vaddr)) };
+
+    Lock_guard<Spinlock> guard(lock_);
+    free_chunks_ = free_chunks_ | (1 << idx);
+}
+
 mword Fpu_allocator::walk(size_t idx)
 {
     const mword vaddr { idx_to_virt(idx) };
