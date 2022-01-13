@@ -29,6 +29,8 @@
 // 0xffff_ffff_e000_0000 SPC_LOCAL_OBJ
 // 0xffff_ffff_df00_0000 SPC_LOCAL_REMAP
 
+// 0xffff_ffff_e000_3000 SPC_LOCAL_FPU_E
+// 0xffff_ffff_c000_3000 SPC_LOCAL_FPU
 // 0xffff_ffff_c000_2000 SPC_LOCAL_IOP_E
 // 0xffff_ffff_c000_0000 SPC_LOCAL / SPC_LOCAL_IOP
 // 0xffff_ffff_bfff_e000 TSS_AREA
@@ -79,6 +81,9 @@ static_assert(LOAD_ADDR % LOAD_ADDR_ALIGN == 0, "Link-time alignment is broken")
 #define SPC_LOCAL_OBJ   (END_SPACE_LIM - 0x20000000)
 
 #define END_SPACE_LIM   (~0UL + 1)
+
+#define SPC_LOCAL_FPU   (SPC_LOCAL_IOP_E + 0x1000)
+#define SPC_LOCAL_FPU_E (SPC_LOCAL_FPU + 0x20000000)
 
 // To boot APs, we need a piece of memory below 1MB to put the AP boot code.
 #define CPUBOOT_ADDR    0x1000
