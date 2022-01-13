@@ -59,6 +59,8 @@ class Fpu
 
         static FpuConfig config;
 
+        bool first_load { true };
+
     public:
         static void probe();
         static void init();
@@ -69,7 +71,7 @@ class Fpu
         static bool load_xcr0 (uint64 xcr0);
         static void restore_xcr0();
 
-        Fpu();
+        Fpu() : data (static_cast<FpuCtx*>(cache->alloc())) { }
         ~Fpu() { cache->free (data); }
 
         static size_t size() { return Fpu::config.context_size; }

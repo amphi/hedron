@@ -81,6 +81,13 @@ void Fpu::save()
 
 void Fpu::load()
 {
+    if (EXPECT_FALSE (first_load)) {
+        first_load = false;
+        // Mask exceptions by default according to SysV ABI spec.
+        data->legacy_hdr.fcw = 0x37f;
+        data->legacy_hdr.mxcsr = 0x1f80;
+    }
+
     uint32 xsave_scb_hi {static_cast<uint32>(config.xsave_scb >> 32)};
     uint32 xsave_scb_lo {static_cast<uint32>(config.xsave_scb)};
 
@@ -118,10 +125,4 @@ bool Fpu::load_xcr0 (uint64 xcr0)
 void Fpu::restore_xcr0()
 {
     set_xcr (0, config.xsave_scb);
-}
-
-Fpu::Fpu() : data (static_cast<FpuCtx *>(cache->alloc())) {
-    // Mask exceptions by default according to SysV ABI spec.
-    data->legacy_hdr.fcw = 0x37f;
-    data->legacy_hdr.mxcsr = 0x1f80;
 }
