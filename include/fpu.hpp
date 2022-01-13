@@ -73,4 +73,6 @@ class Fpu
         ~Fpu() { cache->free (data); }
 
         static size_t size() { return Fpu::config.context_size; }
+
+        void* xsave_area() { return data; }
 };
