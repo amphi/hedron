@@ -72,6 +72,7 @@ class Fpu
         static void restore_xcr0();
 
         Fpu() : data (static_cast<FpuCtx*>(cache->alloc())) { }
+        Fpu(void* xsave_area) : data (static_cast<FpuCtx*>(xsave_area)) { }
         ~Fpu() { cache->free (data); }
 
         static size_t size() { return Fpu::config.context_size; }
