@@ -283,12 +283,16 @@ class Ec : public Typed_kobject<Kobject::Type::EC>, public Refcount, public Queu
 
         inline void make_current()
         {
+            const bool handle_fpu { current() != this };
+
             if (current() != this) {
                 current()->save_fsgs_base();
                 load_fsgs_base();
             }
 
-            transfer_fpu(current());
+            if (handle_fpu && !current()->is_idle_ec()) {
+                current()->save_fpu();
+            }
 
             if (EXPECT_FALSE (current()->del_rcu()))
                 Rcu::call (current());
@@ -299,6 +303,10 @@ class Ec : public Typed_kobject<Kobject::Type::EC>, public Refcount, public Queu
             assert (ok);
 
             pd->make_current();
+
+            if (handle_fpu && !is_idle_ec()) {
+                load_fpu();
+            }
         }
 
         // Return to user via the current continuation.
