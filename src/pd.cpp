@@ -18,6 +18,7 @@
  * GNU General Public License version 2 for more details.
  */
 
+#include "fpu.hpp"
 #include "hip.hpp"
 #include "mtrr.hpp"
 #include "pd.hpp"
@@ -32,6 +33,7 @@ ALIGNED(32) No_destruct<Pd> Pd::kern;
 // Constructor for the initial kernel PD.
 Pd::Pd ()
     : Typed_kobject (static_cast<Space_obj *>(this))
+    , fpu_allocator_ (Fpu::size(), this)
 {
     auto mark_avail_phys = [this] (uint64 start, uint64 end, mword attr = 0x7) {
                                Space_mem::insert_root (start >> PAGE_BITS, end >> PAGE_BITS, attr);
@@ -58,9 +60,11 @@ Pd::Pd ()
 }
 
 Pd::Pd (Pd *own, mword sel, mword a, int creation_flags)
-    : Typed_kobject (static_cast<Space_obj *>(own), sel, a, free, pre_free),
-      Space_mem (Hpt::boot_hpt()), is_priv(creation_flags & IS_PRIVILEGED),
-      is_passthrough(creation_flags & IS_PASSTHROUGH)
+    : Typed_kobject (static_cast<Space_obj *>(own), sel, a, free, pre_free)
+    , Space_mem (Hpt::boot_hpt())
+    , fpu_allocator_ (Fpu::size(), this)
+    , is_priv(creation_flags & IS_PRIVILEGED)
+    , is_passthrough(creation_flags & IS_PASSTHROUGH)
 {
 }
 

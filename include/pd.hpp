@@ -22,6 +22,7 @@
 
 #include "cpulocal.hpp"
 #include "crd.hpp"
+#include "fpu_allocator.hpp"
 #include "nodestruct.hpp"
 #include "space_mem.hpp"
 #include "space_obj.hpp"
@@ -60,6 +61,8 @@ class Pd : public Typed_kobject<Kobject::Type::PD>, public Refcount, public Spac
             }
         }
 
+        Fpu_allocator fpu_allocator_;
+
     public:
         CPULOCAL_REMOTE_ACCESSOR(pd, current);
         static No_destruct<Pd> kern;
@@ -74,6 +77,7 @@ class Pd : public Typed_kobject<Kobject::Type::PD>, public Refcount, public Spac
         bool const is_passthrough = false;
 
         void *get_access_page();
+        Fpu_allocator* fpu_allocator() { return &fpu_allocator_; }
 
         Pd();
         ~Pd();
