@@ -20,6 +20,8 @@
 
 #include "cpu.hpp"
 #include "fpu.hpp"
+#include "math.hpp"
+#include "string.hpp"
 #include "x86.hpp"
 
 Fpu::FpuConfig Fpu::config;
@@ -79,6 +81,8 @@ void Fpu::load()
 {
     if (EXPECT_FALSE (first_load)) {
         first_load = false;
+        // clear the area
+        memset(data, 0, align_up(config.context_size+1, 64));
         // Mask exceptions by default according to SysV ABI spec.
         data->legacy_hdr.fcw = 0x37f;
         data->legacy_hdr.mxcsr = 0x1f80;
