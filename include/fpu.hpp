@@ -44,8 +44,6 @@ class Fpu
 
         FpuCtx *data;
 
-        static Slab_cache *cache;
-
         enum class Mode : uint8 {
             XSAVEOPT,
             XSAVE,
@@ -71,9 +69,9 @@ class Fpu
         static bool load_xcr0 (uint64 xcr0);
         static void restore_xcr0();
 
-        Fpu() : data (static_cast<FpuCtx*>(cache->alloc())) { }
+        Fpu() = default;
         Fpu(void* xsave_area) : data (static_cast<FpuCtx*>(xsave_area)) { }
-        ~Fpu() { cache->free (data); }
+        ~Fpu() = default;
 
         static size_t size() { return Fpu::config.context_size; }
 

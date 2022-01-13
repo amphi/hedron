@@ -23,7 +23,6 @@
 #include "x86.hpp"
 
 Fpu::FpuConfig Fpu::config;
-Slab_cache *Fpu::cache;
 
 static const uint64 required_xsave_state {Cpu::XCR0_X87};
 static const uint64 supported_xsave_state
@@ -54,9 +53,6 @@ void Fpu::probe()
 
     Fpu::config = { xcr0, current_context,
         Cpu::feature (Cpu::FEAT_XSAVEOPT) ? Fpu::Mode::XSAVEOPT : Fpu::Mode::XSAVE };
-
-    static Slab_cache fpu_cache {Fpu::config.context_size, 64};
-    cache = &fpu_cache;
 }
 
 void Fpu::init()

@@ -45,7 +45,8 @@ Ec::Ec (Pd *own, unsigned c)
 Ec::Ec (Pd *own, mword sel, Pd *p, void (*f)(), unsigned c, unsigned e, mword u, mword s, int creation_flags)
     : Typed_kobject (static_cast<Space_obj *>(own), sel, Ec::PERM_ALL, free, pre_free), cont (f), pd (p),
       pd_user_page ((creation_flags & MAP_USER_PAGE_IN_OWNER) ? own : p),
-      cpu (static_cast<uint16>(c)), glb (!!f), evt (e)
+      cpu (static_cast<uint16>(c)), glb (!!f), evt (e),
+      fpu(pd->fpu_allocator()->alloc())
 {
     assert (u < USER_ADDR);
     assert ((u & PAGE_MASK) == 0);
@@ -182,6 +183,7 @@ Ec::Ec (Pd *own, mword sel, Pd *p, void (*f)(), unsigned c, unsigned e, mword u,
 //De-constructor
 Ec::~Ec()
 {
+    pd->fpu_allocator()->free(fpu.xsave_area());
     pre_free(this);
 
     if (is_vcpu()) {
